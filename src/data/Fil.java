@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * Created by thinkPAD on 1/9/2016.
  */
-public class Fil {
+public class Fil implements FileOrDir{
     protected Path path;
     protected String fileId;
     protected String fileName;

@@ -1,11 +1,11 @@
 package core;
 
-import actions.Action;
-import actions.Copy;
+import actions.Actions;
 import data.Fil;
 import fileVisitors.IFileVisitor;
 import fileVisitors.ReturnAllFilesVisitor;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +16,14 @@ import java.util.List;
  * 3. create a higher level of API for choosing which dirs to backup to where.
  * 4. optional: standardization of common drives: google drive, dropbox etc...
  * 5. optional include communication for non-desktop cloud services.
- * 6. save previous scans in DB.
+ * 6. save previous scans in DB. use MongoDB
  * 7. view them in gui. allow all high API calls from gui.
  */
 public class API {
     protected String srcDir;
     protected String destDir;
     protected IFileVisitor visitor;
-    protected Action action;
+    protected Method action;
     protected IFileVisitor srcVisitor;
     protected IFileVisitor destVisitor;
     protected List<Fil> srcFiles = new ArrayList<>();
@@ -31,7 +31,6 @@ public class API {
 
     public static API sync() {
         API api = new API();
-        api.action = new Copy();
         return api;
     }
 
@@ -51,8 +50,6 @@ public class API {
     public void go() {
         Crawler.crawl(srcDir,false,-1,srcVisitor);
         Crawler.crawl(destDir,false,-1,destVisitor);
-        for (Fil f : srcFiles) {
-            System.out.println(f);
-        }
+
     }
 }
