@@ -1,8 +1,6 @@
 package actions;
 
-import data.Dir;
 import data.Fil;
-import data.FileOrDir;
 import utils.Pair;
 
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ import java.util.function.Function;
 public interface Actions {
     //<T extends FileOrDir> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T,T> predicate,Function<Pair<T,T>,T> f);
 
-    public static <T extends FileOrDir> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T, T> predicate,
+    public static <T> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T, T> predicate,
     Function<Pair<T,T>,T> f) {
         Collection<T> result = new ArrayList<>();
         for (T f1: src){

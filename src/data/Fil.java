@@ -1,11 +1,14 @@
 package data;
 
+import interfaces.IFile;
+
 import java.nio.file.Path;
+import java.util.Date;
 
 /**
  * Created by thinkPAD on 1/9/2016.
  */
-public class Fil implements FileOrDir{
+public class Fil implements IFile{
     protected Path path;
     protected String fileId;
     protected String fileName;
@@ -34,5 +37,21 @@ public class Fil implements FileOrDir{
     @Override
     public String toString() {
         return "Fil "+path.toString();
+    }
+
+    @Override
+    public boolean isChanged(IFile otherFile) {
+        return false;
+    }
+
+    @Override
+    public String getModificationDateString() {
+        return null;
+    }
+
+
+    @Override
+    public byte[] getHash() {
+        return new byte[0];
     }
 }
