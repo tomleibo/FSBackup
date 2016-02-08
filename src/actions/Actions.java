@@ -14,7 +14,7 @@ import java.util.function.Function;
 public interface Actions {
     //<T extends FileOrDir> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T,T> predicate,Function<Pair<T,T>,T> f);
 
-    public static <T> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T, T> predicate,
+    public static <T> Collection<T> collect(Collection<T> src, Collection<T> dest, BiPredicate<T, T> predicate,
     Function<Pair<T,T>,T> f) {
         Collection<T> result = new ArrayList<>();
         for (T f1: src){
@@ -28,15 +28,13 @@ public interface Actions {
     }
 
     public static Collection<Fil> copyChangedFiles(Collection<Fil> src, Collection<Fil> dest) {
-        Collection<Fil> result = new ArrayList<>();
-        /*****
-         *
-         *
-         * Call Operate with lambda expression.
-         *
-         *
-         *
+        /*
+
+        complete last argument
+
+
+
          */
-        return result;
+        return collect(src,dest,(file1,file2)->file1.isSameFile(file2)&&file1.isChanged(file2),(p)->new Fil());
     }
 }

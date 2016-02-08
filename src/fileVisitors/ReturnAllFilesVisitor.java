@@ -24,7 +24,7 @@ public class ReturnAllFilesVisitor extends AbstractFileVisitor {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        Fil pfile = new Fil(file);
+        Fil pfile = new Fil(file,attrs);
         files.add(pfile);
         return super.visitFile(file, attrs);
     }

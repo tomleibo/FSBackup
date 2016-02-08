@@ -2,7 +2,9 @@ package data;
 
 import interfaces.IFile;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 /**
@@ -10,33 +12,36 @@ import java.util.Date;
  */
 public class Fil implements IFile{
     protected Path path;
-    protected String fileId;
     protected String fileName;
-    protected String parentDirectoryId;
     protected String parentDirectoryPath;
-    protected String sourceDirectoryId;
-    protected String sourceDirectoryPath;
-    protected String owner;
-    protected String scanTime;
-    protected boolean isRemoved;
-
-    protected String operatingSystem;
     protected long size;
-    protected String creationTime;
-    protected String modificationTime;
-    protected String contentType;
+    protected long creationTime;
+    protected long modificationTime;
     protected Boolean isSymbolic;
 
-    public Fil() {
+    public Fil(Path path, BasicFileAttributes attrs) {
+        this.path=path;
+        this.fileName=path.getFileName().toString();
+        this.parentDirectoryPath = new File(path.toString()).getParent().substring(path.toString().lastIndexOf("\\") + 1, path.toString().length());
+        this.size=attrs.size();
+        this.creationTime=attrs.creationTime().toMillis();
+        this.modificationTime=attrs.lastModifiedTime().toMillis();
+        this.isSymbolic=attrs.isSymbolicLink();
     }
 
-    public Fil(Path path) {
-        this.path = path;
+    public Fil() {
+
     }
+
 
     @Override
     public String toString() {
         return "Fil "+path.toString();
+    }
+
+    @Override
+    public boolean isSameFile(IFile other) {
+        return path.equals(other.getPath());
     }
 
     @Override
@@ -53,5 +58,10 @@ public class Fil implements IFile{
     @Override
     public byte[] getHash() {
         return new byte[0];
+    }
+
+    @Override
+    public Path getPath() {
+        return path;
     }
 }
