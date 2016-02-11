@@ -5,7 +5,6 @@ import interfaces.IFile;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 
 /**
  * Created by thinkPAD on 1/9/2016.
@@ -19,10 +18,11 @@ public class Fil implements IFile{
     protected long modificationTime;
     protected Boolean isSymbolic;
 
+
     public Fil(Path path, BasicFileAttributes attrs) {
         this.path=path;
         this.fileName=path.getFileName().toString();
-        this.parentDirectoryPath = new File(path.toString()).getParent().substring(path.toString().lastIndexOf("\\") + 1, path.toString().length());
+        //this.parentDirectoryPath = new File(path.toString()).getParent().substring(path.toString().lastIndexOf("\\") + 1, path.toString().length());
         this.size=attrs.size();
         this.creationTime=attrs.creationTime().toMillis();
         this.modificationTime=attrs.lastModifiedTime().toMillis();
@@ -56,25 +56,44 @@ public class Fil implements IFile{
 
     @Override
     public boolean isSameFile(IFile other) {
-        return path.equals(other.getPath());
+        return path.equals(other.getPath()) && (this.isDir() == other.isDir());
     }
 
     @Override
     public boolean isChanged(IFile otherFile) {
-        return false;
+        return isSameFile(otherFile) && !getModificationDateString().equals(otherFile.getModificationDateString());
     }
 
     @Override
     public String getModificationDateString() {
-        return null;
+        return modificationTime+"";
     }
-
-
+/*
     @Override
     public byte[] getHash() {
-        return new byte[0];
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        }
+        catch (NoSuchAlgorithmException e) {
+            //never happens.
+        }
+        try (InputStream is = Files.newInputStream(path);
+             DigestInputStream dis = new DigestInputStream(is, md))
+        {
+            int numRead;
+            do {
+                byte[] buffer = new byte[1024];
+                numRead = dis.read(buffer);
+            } while (numRead != -1);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] digest = md.digest();
+        return digest;
     }
-
+*/
     @Override
     public Path getPath() {
         return path;
