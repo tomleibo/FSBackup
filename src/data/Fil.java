@@ -33,6 +33,21 @@ public class Fil implements IFile{
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Fil fil = (Fil) o;
+
+        return getPath().equals(fil.getPath());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getPath().hashCode();
+    }
 
     @Override
     public String toString() {
@@ -63,5 +78,10 @@ public class Fil implements IFile{
     @Override
     public Path getPath() {
         return path;
+    }
+
+    @Override
+    public boolean isDir() {
+        return false;
     }
 }

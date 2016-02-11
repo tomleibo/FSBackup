@@ -1,26 +1,27 @@
 package fileVisitors;
 
 import data.Fil;
+import interfaces.IFile;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by thinkPAD on 1/9/2016.
  */
 public class ReturnAllFilesVisitor extends AbstractFileVisitor {
-    public static ReturnAllFilesVisitor build(List<Fil> files) {
+    public static ReturnAllFilesVisitor build(Set<IFile> files) {
         return new ReturnAllFilesVisitor(files);
     }
 
-    public ReturnAllFilesVisitor(List<Fil> files) {
-        this.files = files;
+    public ReturnAllFilesVisitor(Set<IFile> files) {
+        super(files);
     }
 
-    List<Fil> files = null;
+    Set<Fil> files = null;
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

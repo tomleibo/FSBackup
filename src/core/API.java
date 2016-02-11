@@ -1,13 +1,12 @@
 package core;
 
-import actions.Actions;
-import data.Fil;
 import fileVisitors.IFileVisitor;
 import fileVisitors.ReturnAllFilesVisitor;
+import interfaces.IFile;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TODO in Actions.
@@ -29,8 +28,8 @@ public class API {
     protected Method action;
     protected IFileVisitor srcVisitor;
     protected IFileVisitor destVisitor;
-    protected List<Fil> srcFiles = new ArrayList<>();
-    protected List<Fil> destFiles=new ArrayList<>();
+    protected Set<IFile> srcFiles = new HashSet<>();
+    protected Set<IFile> destFiles=new HashSet<>();
 
     public static API sync() {
         API api = new API();
