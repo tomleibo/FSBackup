@@ -1,6 +1,6 @@
 package core;
 
-import fileVisitors.IFileVisitor;
+import fileVisitors.AbstractFileVisitor;
 import fileVisitors.ReturnAllFilesVisitor;
 import interfaces.IFile;
 
@@ -13,8 +13,7 @@ import java.util.Set;
  * implement Fil
  *
  * Some ideas:
- * 1. create a basic action API containing: move, copy, delete, copy & override
- * 2. create a higher level of API above it containing: full backup, differential backup, incremental backup.
+ * 1. create a basic action API containing: copy + override, move non-existent, incremental backup (based on diff), delete duplicates
  * 3. create a higher level of API for choosing which dirs to backup to where.
  * 4. optional: standardization of common drives: google drive, dropbox etc...
  * 5. optional include communication for non-desktop cloud services.
@@ -24,10 +23,10 @@ import java.util.Set;
 public class API {
     protected String srcDir;
     protected String destDir;
-    protected IFileVisitor visitor;
+    protected AbstractFileVisitor visitor;
     protected Method action;
-    protected IFileVisitor srcVisitor;
-    protected IFileVisitor destVisitor;
+    protected AbstractFileVisitor srcVisitor;
+    protected AbstractFileVisitor destVisitor;
     protected Set<IFile> srcFiles = new HashSet<>();
     protected Set<IFile> destFiles=new HashSet<>();
 

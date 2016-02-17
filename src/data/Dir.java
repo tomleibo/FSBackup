@@ -2,10 +2,11 @@ package data;
 
 import interfaces.IFile;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by thinkPAD on 1/11/2016.
@@ -15,18 +16,16 @@ public class Dir implements IFile {
 
 
     Path path;
-    Map<IFile,IFile> files;
+    Map<Dir,Dir> dirs;
     boolean isLazy;
 
     public Dir(Path path, BasicFileAttributes attrs) {
         this.path=path;
         this.isLazy=true;
-        this.files = new HashMap<>();
+        this.dirs = new HashMap<>();
     }
 
-    public boolean addFile (IFile file) {
-        return files.put(file,file)==null;
-    }
+    public boolean addDir(Dir dir) {return dirs.put(dir,dir)==null;}
 
     @Override
     public boolean equals(Object o) {
@@ -40,13 +39,24 @@ public class Dir implements IFile {
     }
 
     @Override
+    public int hashCode() {
+        return getPath().hashCode();
+    }
+
+    @Override
     public boolean isSameFile(IFile other) {
         return path.equals(other.getPath()) && (this.isDir() == other.isDir());
     }
 
-    public Map<IFile,IFile> getFiles(IFile file) {
-        return files;
+    public Map<Dir,Dir> getDirs() {
+        return dirs;
     }
+
+    public Collection<File> getFiles(){
+        List<File> files = Arrays.asList(new File(path.toString()).listFiles());
+        return files.stream().filter((file)->file.isFile()).collect(Collectors.toList());
+    }
+
 
     @Override
     public boolean isChanged(IFile otherFile) {
@@ -60,7 +70,7 @@ public class Dir implements IFile {
 
     @Override
     public Path getPath() {
-        return null;
+        return path;
     }
 
     @Override
@@ -76,21 +86,23 @@ public class Dir implements IFile {
         this.isLazy = isLazy;
     }
 
-    @Override
-    public String toString() {
+
+    public String print() {
         StringBuilder sb= new StringBuilder();
         sb.append("Dir: "+path.toString()+"\n");
-        for (IFile file : files.keySet()){
-            if (file.isDir()) {
-                String[] lines = file.toString().split("\n");
-                for (String line:lines) {
-                    sb.append("\t"+line+"\n");
-                }
-            }
-            else {
-                sb.append("File: " + path.toString()+"\n");
+        for (Dir dir : dirs.keySet()){
+            String[] lines = dir.print().split("\n");
+            for (String line:lines) {
+                sb.append("\t"+line+"\n");
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Dir{" +
+                "path=" + path +
+                '}';
     }
 }
