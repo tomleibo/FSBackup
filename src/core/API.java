@@ -9,8 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TODO in Actions.
- * implement Fil
+ * dont forget to set modification date after copy.
  *
  * Some ideas:
  * 1. create a basic action API containing: copy + override, move non-existent, incremental backup (based on diff), delete duplicates

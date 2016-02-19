@@ -6,18 +6,22 @@ import data.Scan;
 import utils.Pair;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by thinkPAD on 1/11/2016.
  */
 public interface Actions {
-    //<T extends FileOrDir> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T,T> predicate,Function<Pair<T,T>,T> f);
-
+    //<T extends FilOrDir> Collection<T> operate(Collection<T> src, Collection<T> dest, BiPredicate<T,T> predicate,Function<Pair<T,T>,T> f);
+    static final Logger log = Logger.getLogger(Actions.class.getName());
 
     //TODO what if dest is null
     static <T> Collection<Pair<T,T>> collect(Map<T,T> src, Map<T,T> dest, BiPredicate<T, T> predicate) {
@@ -34,43 +38,55 @@ public interface Actions {
         return result;
     }
 
-    static Collection<Pair<File,File>> keepChangedFiles(Map<File,File> src, Map<File,File> dest) {
-        return collect(src,dest,(file1,file2)->file1.lastModified() == file2.lastModified());
+    static Collection<Pair<Fil,Fil>> keepChangedFils(Map<Fil,Fil> src, Map<Fil,Fil> dest) {
+        return collect(src,dest,(Fil1,Fil2)->Fil1.getModificationDate() == Fil2.getModificationDate());
     }
 
     static void keepChangedDirs(Scan scan,Dir src,Dir dest) {
-        if (!src.isSameFile(dest)) {
+        if (!src.equals(dest)) {
             throw new RuntimeException("dirs are not equal.");
         }
+        if (scan==null) {
+            throw new NullPointerException("scan is null");
+        }
         Dir dir2=null;
-        Collection<Pair<File, File>> files = collectChangedFilesOfOneDir(src, dest);
-        if (files != null && !files.isEmpty()) {
-            scan.add(files);
+        Collection<Pair<Fil, Fil>> Fils = collectChangedFilsOfOneDir(src, dest);
+        if (Fils != null && !Fils.isEmpty()) {
+            scan.add(Fils);
             scan.add(src,dest);
         }
-        //TODO complete this. at return scan should contain all files that should be diffed and patched.
-        // dirs are all the dirs with changes. not for any functionality just for auditing.
-        // complete the algorithm for dirs.
+        if (src.getDirs()==null) {
+            return;
+        }
         for (Dir dir : src.getDirs().keySet()) {
             dir2 = dest.getDirs().get(dir);
             if (dir2==null) {
                 scan.add(dir,null);
             }
-
-            keepChangedDirs(scan,dir,dir2);
+            else {
+                keepChangedDirs(scan, dir, dir2);
+            }
         }
     }
 
-    static Collection<Pair<File, File>> collectChangedFilesOfOneDir(Dir src, Dir dest) {
-        Map<File,File> srcFiles = new HashMap<>();
-        for (File file:src.getFiles()) {
-            srcFiles.put(file,file);
+    static Collection<Pair<Fil, Fil>> collectChangedFilsOfOneDir(Dir src, Dir dest) {
+        Map<Fil,Fil> srcFils = new HashMap<>();
+        try {
+            for (File file : src.getFiles()) {
+                srcFils.put(new Fil(file, src.getBasePath()), new Fil(file, src.getBasePath()));
+            }
+            Map<Fil, Fil> destFils = new HashMap<>();
+            for (File file : dest.getFiles()) {
+                destFils.put(new Fil(file, dest.getBasePath()), new Fil(file, dest.getBasePath()));
+            }
+            return (keepChangedFils(srcFils, destFils));
         }
-        Map<File,File> destFiles = new HashMap<>();
-        for (File file:dest.getFiles()) {
-            destFiles.put(file,file);
+        catch (IOException e ) {
+            log.log(Level.WARNING,"creating files created an IOE.");
+            log.log(Level.WARNING, e.getLocalizedMessage());
+            return new ArrayList<>();
         }
-        return (keepChangedFiles(srcFiles,destFiles));
+
     }
 
 }

@@ -2,10 +2,8 @@ package fileVisitors;
 
 import core.Crawler;
 import data.Dir;
-import data.Fil;
 import interfaces.IFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
@@ -23,7 +21,7 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path> {
     private static final Logger log = Logger.getLogger(AbstractFileVisitor.class.getName());
     public Dir result=null;
     protected Stack<Dir> stack =null;
-
+    Path basePath = null;
     public AbstractFileVisitor(Set<IFile> files) {
         this.stack = new Stack<>();
     }
@@ -31,7 +29,10 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         log.log(Level.INFO, "previsiting: " + dir.toString());
-        Dir idir = (Dir)IFile.build(dir, attrs);
+        if (basePath==null) {
+            basePath=dir;
+        }
+        Dir idir = new Dir(basePath,dir,attrs);
         if (result==null) {
             result=idir;
         }
@@ -39,7 +40,7 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path> {
             stack.peek().addDir(idir);
         }
         if (preFilter(dir,attrs)) {
-            log.log(Level.INFO,"pushing: "+idir.getPath().toString());
+            log.log(Level.INFO,"pushing: "+idir.getRelPath().toString());
             stack.add(idir);
         }
         else {
@@ -52,7 +53,7 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
         log.log(Level.INFO,"postvisiting: " + dir.toString());
         Dir pop = stack.pop();
-        log.log(Level.INFO, "popped: " + pop.getPath().toString());
+        log.log(Level.INFO, "popped: " + pop.getRelPath().toString());
         return super.postVisitDirectory(dir, exc);
     }
 

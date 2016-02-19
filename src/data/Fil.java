@@ -3,34 +3,37 @@ package data;
 import interfaces.IFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * Created by thinkPAD on 1/9/2016.
  */
-public class Fil implements IFile{
-    protected Path path;
+public class Fil {
+    protected Path basePath;
+    protected Path relPath;
     protected String fileName;
-    protected String parentDirectoryPath;
+
     protected long size;
     protected long creationTime;
     protected long modificationTime;
     protected Boolean isSymbolic;
 
 
-    public Fil(Path path, BasicFileAttributes attrs) {
-        this.path=path;
-        this.fileName=path.getFileName().toString();
-        //this.parentDirectoryPath = new File(path.toString()).getParent().substring(path.toString().lastIndexOf("\\") + 1, path.toString().length());
+    public Fil(Path basePath, Path fullPath, BasicFileAttributes attrs) {
+        this.basePath = basePath;
+        this.relPath = basePath.relativize(fullPath);
+        this.fileName= relPath.getFileName().toString();
         this.size=attrs.size();
         this.creationTime=attrs.creationTime().toMillis();
         this.modificationTime=attrs.lastModifiedTime().toMillis();
         this.isSymbolic=attrs.isSymbolicLink();
     }
 
-    public Fil() {
-
+    public Fil(File file, Path basePath) throws IOException {
+        this(basePath,file.toPath(),Files.readAttributes(file.toPath(),BasicFileAttributes.class));
     }
 
     @Override
@@ -40,33 +43,30 @@ public class Fil implements IFile{
 
         Fil fil = (Fil) o;
 
-        return getPath().equals(fil.getPath());
+        return getRelPath().equals(fil.getRelPath());
 
     }
 
     @Override
     public int hashCode() {
-        return getPath().hashCode();
+        return getRelPath().hashCode();
     }
 
     @Override
     public String toString() {
-        return "Fil "+path.toString();
+        return "Fil "+ relPath.toString();
     }
 
-    @Override
-    public boolean isSameFile(IFile other) {
-        return path.equals(other.getPath()) && (this.isDir() == other.isDir());
+    public boolean isSameFile(Fil other) {
+        return relPath.equals(other.getRelPath()) && (this.isDir() == other.isDir());
     }
 
-    @Override
-    public boolean isChanged(IFile otherFile) {
-        return isSameFile(otherFile) && !getModificationDateString().equals(otherFile.getModificationDateString());
+    public boolean isChanged(Fil otherFile) {
+        return isSameFile(otherFile) && getModificationDate() != (otherFile.getModificationDate());
     }
 
-    @Override
-    public String getModificationDateString() {
-        return modificationTime+"";
+    public long getModificationDate() {
+        return modificationTime;
     }
 /*
     @Override
@@ -78,7 +78,7 @@ public class Fil implements IFile{
         catch (NoSuchAlgorithmException e) {
             //never happens.
         }
-        try (InputStream is = Files.newInputStream(path);
+        try (InputStream is = Files.newInputStream(relPath);
              DigestInputStream dis = new DigestInputStream(is, md))
         {
             int numRead;
@@ -94,12 +94,12 @@ public class Fil implements IFile{
         return digest;
     }
 */
-    @Override
-    public Path getPath() {
-        return path;
+
+    public Path getRelPath() {
+        return relPath;
     }
 
-    @Override
+
     public boolean isDir() {
         return false;
     }

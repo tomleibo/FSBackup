@@ -14,13 +14,15 @@ import java.util.stream.Collectors;
 public class Dir implements IFile {
     //TODO: building hashset with initial capacity will increase performance.
 
-
-    Path path;
+    Path basePath;
+    Path relPath;
     Map<Dir,Dir> dirs;
     boolean isLazy;
 
-    public Dir(Path path, BasicFileAttributes attrs) {
-        this.path=path;
+
+    public Dir(Path basePath, Path path, BasicFileAttributes attrs) {
+        this.basePath=basePath;
+        this.relPath =basePath.relativize(path);
         this.isLazy=true;
         this.dirs = new HashMap<>();
     }
@@ -34,18 +36,18 @@ public class Dir implements IFile {
 
         Dir dir = (Dir) o;
 
-        return getPath().equals(dir.getPath());
+        return getRelPath().equals(dir.getRelPath());
 
     }
 
     @Override
     public int hashCode() {
-        return getPath().hashCode();
+        return getRelPath().hashCode();
     }
 
     @Override
     public boolean isSameFile(IFile other) {
-        return path.equals(other.getPath()) && (this.isDir() == other.isDir());
+        return relPath.equals(other.getRelPath()) && (this.isDir() == other.isDir());
     }
 
     public Map<Dir,Dir> getDirs() {
@@ -53,7 +55,7 @@ public class Dir implements IFile {
     }
 
     public Collection<File> getFiles(){
-        List<File> files = Arrays.asList(new File(path.toString()).listFiles());
+        List<File> files = Arrays.asList(new File(relPath.toString()).listFiles());
         return files.stream().filter((file)->file.isFile()).collect(Collectors.toList());
     }
 
@@ -69,8 +71,8 @@ public class Dir implements IFile {
     }
 
     @Override
-    public Path getPath() {
-        return path;
+    public Path getRelPath() {
+        return relPath;
     }
 
     @Override
@@ -89,7 +91,7 @@ public class Dir implements IFile {
 
     public String print() {
         StringBuilder sb= new StringBuilder();
-        sb.append("Dir: "+path.toString()+"\n");
+        sb.append("Dir: "+ relPath.toString()+"\n");
         for (Dir dir : dirs.keySet()){
             String[] lines = dir.print().split("\n");
             for (String line:lines) {
@@ -99,10 +101,15 @@ public class Dir implements IFile {
         return sb.toString();
     }
 
+    public Path getBasePath() {
+        return basePath;
+    }
+
     @Override
     public String toString() {
         return "Dir{" +
-                "path=" + path +
+                "basePath=" + basePath+
+                "relPath=" + relPath +
                 '}';
     }
 }

@@ -29,7 +29,7 @@ public class Scan {
         changedFiles.add(new Pair<>(src,dest));
     }
 
-    public void add(Collection<Pair<File,File>> files) {
+    public void add(Collection<Pair<Fil, Fil>> files) {
         for (Pair p : files) {
             changedFiles.add(p);
         }
